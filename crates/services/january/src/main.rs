@@ -16,6 +16,8 @@ pub mod website_embed;
 async fn main() -> Result<(), std::io::Error> {
     // Configure logging and environment
     revolt_config::configure!(proxy);
+	
+	tracing_subscriber::fmt::init();
 
     // Configure API schema
     #[derive(OpenApi)]
