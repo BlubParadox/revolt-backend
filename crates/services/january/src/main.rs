@@ -1,7 +1,6 @@
-use std::net::{Ipv4Addr, SocketAddr};
+use std::{env, net::{Ipv4Addr, SocketAddr}};
 
 use axum::Router;
-
 use tokio::net::TcpListener;
 use utoipa::{
     openapi::security::{Http, HttpAuthScheme, SecurityScheme},
@@ -65,10 +64,16 @@ async fn main() -> Result<(), std::io::Error> {
         .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .nest("/", api::router().await);
 
-    // Configure TCP listener and bind
-    tracing::info!("Listening on 0.0.0.0:14705");
-    tracing::info!("Play around with the API: http://localhost:14705/scalar");
-    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 14705));
+    // Use PORT from env or default to 14705
+    let port = env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(14705);
+    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
+
+    tracing::info!("Listening on 0.0.0.0:{port}");
+    tracing::info!("Play around with the API: http://localhost:{port}/scalar");
+
     let listener = TcpListener::bind(&address).await?;
     axum::serve(listener, app.into_make_service()).await
 }
