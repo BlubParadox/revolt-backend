@@ -6,7 +6,6 @@ WORKDIR /home/rust/src
 ARG TARGETARCH
 
 # Install build requirements
-RUN dpkg --add-architecture "${TARGETARCH}"
 RUN apt-get update && \
     apt-get install -y \
     make \
