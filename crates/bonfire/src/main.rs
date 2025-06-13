@@ -14,7 +14,7 @@ mod websocket;
 
 #[async_std::main]
 async fn main() {
-    // Configure requirements for Bonfire.
+    // Configure requirements for Bonfire. Check
     revolt_config::configure!(events);
     database::connect().await;
 
