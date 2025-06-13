@@ -1,19 +1,20 @@
 #!/bin/sh
 
 if [ -z "$TARGETARCH" ]; then
-  :
-else
-  case "${TARGETARCH}" in
-    "amd64")
-      LINKER_NAME="x86_64-linux-gnu-gcc"
-      LINKER_PACKAGE="gcc-x86-64-linux-gnu"
-      BUILD_TARGET="x86_64-unknown-linux-gnu" ;;
-    "arm64")
-      LINKER_NAME="aarch64-linux-gnu-gcc"
-      LINKER_PACKAGE="gcc-aarch64-linux-gnu"
-      BUILD_TARGET="aarch64-unknown-linux-gnu" ;;
-  esac
+  TARGETARCH="amd64"  # default to amd64 if not set
 fi
+
+case "${TARGETARCH}" in
+  "amd64")
+    LINKER_NAME="x86_64-linux-gnu-gcc"
+    LINKER_PACKAGE="gcc-x86-64-linux-gnu"
+    BUILD_TARGET="x86_64-unknown-linux-gnu" ;;
+  "arm64")
+    LINKER_NAME="aarch64-linux-gnu-gcc"
+    LINKER_PACKAGE="gcc-aarch64-linux-gnu"
+    BUILD_TARGET="aarch64-unknown-linux-gnu" ;;
+esac
+
 
 tools() {
   apt-get install -y "${LINKER_PACKAGE}"
