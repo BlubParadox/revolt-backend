@@ -1,6 +1,8 @@
 use std::net::{Ipv4Addr, SocketAddr};
 
 use axum::Router;
+use axum::routing::get;
+
 
 use revolt_database::DatabaseInfo;
 use tokio::net::TcpListener;
