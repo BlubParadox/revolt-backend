@@ -18,7 +18,7 @@ async fn main() -> Result<(), std::io::Error> {
     // Configure logging and environment
     revolt_config::configure!(proxy);
 	
-	tracing_subscriber::fmt::init();
+	let _ = tracing_subscriber::fmt::try_init();
 
     // Configure API schema
     #[derive(OpenApi)]
