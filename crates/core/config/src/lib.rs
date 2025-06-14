@@ -391,10 +391,33 @@ impl Settings {
 }
 
 pub async fn init() {
+    let config = config().await;
+
+    println!(":: Revolt Configuration Loaded ::");
+
     println!(
-        ":: Revolt Configuration ::\n\x1b[32m{:?}\x1b[0m",
-        config().await
+        "[DEBUG] MAIL_ENABLED via SMTP host: {}",
+        config.api.smtp.host
     );
+    println!(
+        "[DEBUG] MAIL_FROM_ADDRESS: {}",
+        config.api.smtp.from_address
+    );
+    println!(
+        "[DEBUG] CAPTCHA_KEY: {}",
+        config.api.security.captcha.hcaptcha_key
+    );
+    println!(
+        "[DEBUG] CAPTCHA_SITE_KEY: {}",
+        config.api.security.captcha.hcaptcha_sitekey
+    );
+
+    // If you want all envs just in case:
+    for (key, value) in std::env::vars() {
+        if key.contains("MAIL") || key.contains("SMTP") || key.contains("CAPTCHA") {
+            println!("[ENV] {key} = {value}");
+        }
+    }
 }
 
 pub async fn read() -> Config {
