@@ -10,4 +10,6 @@ trap 'pkill -f revolt-' SIGINT
 cargo run --bin revolt-delta &
 cargo run --bin revolt-bonfire &
 cargo run --bin revolt-autumn &
-cargo run --bin revolt-january
+cargo run --bin revolt-january &
+
+wait  # THIS waits for all background processes to exit

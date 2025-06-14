@@ -37,6 +37,27 @@ COPY crates ./crates
 RUN sh /tmp/build-image-layer.sh apps
 
 # Copy the start.sh script into the container
-COPY scripts/start.sh ./scripts/start.sh
-RUN chmod +x ./scripts/start.sh
+COPY scripts/start.sh ./start.sh
+RUN chmod +x ./start.sh
 
+# === Runtime Stage ===
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+# Copy only the built binaries and start.sh script from builder stage
+COPY --from=builder /home/rust/src/target/release/revolt-delta ./revolt-delta
+COPY --from=builder /home/rust/src/target/release/revolt-bonfire ./revolt-bonfire
+COPY --from=builder /home/rust/src/target/release/revolt-autumn ./revolt-autumn
+COPY --from=builder /home/rust/src/target/release/revolt-january ./revolt-january
+COPY --from=builder /home/rust/src/target/release/revolt-pushd ./revolt-pushd
+
+COPY --from=builder /home/rust/src/start.sh ./start.sh
+RUN chmod +x ./start.sh
+
+# Install any runtime dependencies your binaries need (if any)
+RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 14704 14705
+
+CMD ["./start.sh"]
