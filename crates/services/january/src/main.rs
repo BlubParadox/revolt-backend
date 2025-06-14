@@ -1,6 +1,7 @@
 use std::{env, net::{Ipv4Addr, SocketAddr}};
 
 use axum::Router;
+use axum::routing::get;
 use tokio::net::TcpListener;
 use utoipa::{
     openapi::security::{Http, HttpAuthScheme, SecurityScheme},
