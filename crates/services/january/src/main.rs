@@ -61,8 +61,13 @@ async fn main() -> Result<(), std::io::Error> {
         }
     }
 
+	async fn health() -> &'static str {
+		"OK"
+	}
+
     // Configure Axum and router
     let app = Router::new()
+		.route("/health", get(health))
         .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .nest("/", api::router().await);
 

@@ -4,6 +4,7 @@ pub use rocket::http::Status;
 pub use rocket::response::Redirect;
 use rocket::{Build, Rocket};
 
+mod health;
 mod bots;
 mod channels;
 mod customisation;
@@ -106,6 +107,7 @@ pub fn mount(config: Settings, mut rocket: Rocket<Build>) -> Rocket<Build> {
     }
 
     rocket
+	.mount("/", routes![health::health])
 }
 
 fn custom_openapi_spec() -> OpenApi {
