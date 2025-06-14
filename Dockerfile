@@ -35,3 +35,8 @@ RUN sh /tmp/build-image-layer.sh deps
 # Build all apps
 COPY crates ./crates
 RUN sh /tmp/build-image-layer.sh apps
+
+# Copy the start.sh script into the container
+COPY scripts/start.sh ./scripts/start.sh
+RUN chmod +x ./scripts/start.sh
+
