@@ -26,8 +26,9 @@ async fn main() {
 
     // Setup a TCP listener to accept WebSocket connections on.
     // By default, we bind to port 14703 on all interfaces.
-    let bind = env::var("HOST").unwrap_or_else(|_| "0.0.0.0:14705".into());
-    info!("Listening on host {bind}");
+    let port = env::var("PORT").unwrap_or_else(|_| "14705".into());
+	let bind = format!("0.0.0.0:{}", port);
+	info!("Listening on {bind}");
     let try_socket = TcpListener::bind(bind).await;
 	info!("Bonfire WebSocket server running at 0.0.0.0:14705");
     let listener = try_socket.expect("Failed to bind");
