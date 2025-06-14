@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 set -e
-cargo build \
-    --bin revolt-delta \
-    --bin revolt-bonfire \
-    --bin revolt-autumn \
-    --bin revolt-january
 
+# Trap Ctrl+C (SIGINT) to kill all child processes
 trap 'pkill -f revolt-' SIGINT
-cargo run --bin revolt-delta &
-cargo run --bin revolt-bonfire &
-cargo run --bin revolt-autumn &
-cargo run --bin revolt-january &
 
-wait  # THIS waits for all background processes to exit
+# Run the compiled binaries directly (no cargo!)
+./revolt-delta &
+./revolt-bonfire &
+./revolt-autumn &
+./revolt-january
+
+# Wait so container doesn't immediately exit
+wait
