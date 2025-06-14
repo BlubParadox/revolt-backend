@@ -79,5 +79,7 @@ async fn main() -> Result<(), std::io::Error> {
     // Configure TCP listener and bind
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 14704));
     let listener = TcpListener::bind(&address).await?;
+	
+	println!("Autumn API is live on http://0.0.0.0:14704");
     axum::serve(listener, app.into_make_service()).await
 }

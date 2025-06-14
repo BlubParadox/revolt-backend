@@ -29,6 +29,7 @@ async fn main() {
     let bind = env::var("HOST").unwrap_or_else(|_| "0.0.0.0:14705".into());
     info!("Listening on host {bind}");
     let try_socket = TcpListener::bind(bind).await;
+	info!("Bonfire WebSocket server running at 0.0.0.0:14705");
     let listener = try_socket.expect("Failed to bind");
 
     // Start accepting new connections and spawn a client for each connection.
