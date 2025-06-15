@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use cached::proc_macro::cached;
-use config::{Config, File, FileFormat, Environment};
+use config::{Config, Environment};
 use futures_locks::RwLock;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -386,9 +386,10 @@ pub async fn read() -> Config {
     CONFIG_BUILDER.read().await.clone()
 }
 
-#[cached(time = 30)]
+
 use figment::error::Error as FigmentError;
 
+#[cached(time = 30)]
 pub async fn config() -> Settings {
     let raw = read().await;
 
