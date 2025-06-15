@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use cached::proc_macro::cached;
-use config::{Config, File, FileFormat};
+use config::{Config, File, FileFormat, Environment};
 use futures_locks::RwLock;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -49,8 +49,6 @@ macro_rules! report_internal_error {
             .map_err(|_| ::revolt_result::create_error!(InternalError))
     };
 }
-
-use config::{Config, Environment};
 
 /// Configuration builder using only environment variables
 static CONFIG_BUILDER: Lazy<RwLock<Config>> = Lazy::new(|| {
