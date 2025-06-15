@@ -392,9 +392,7 @@ use figment::error::Error as FigmentError;
 pub async fn config() -> Settings {
     let raw = read().await;
 
-    let result = raw.try_deserialize::<Settings>();
-
-    match result {
+    let mut config = match raw.try_deserialize::<Settings>() {
         Ok(config) => config,
         Err(FigmentError::MissingField(missing_field)) => {
             eprintln!("Missing required config field: {}", missing_field);
@@ -415,9 +413,7 @@ pub async fn config() -> Settings {
 
             panic!("Config could not be deserialized");
         }
-    }
-}
-
+    };
 
     // inject REDIS_URI for redis-kiss library
     if std::env::var("REDIS_URL").is_err() {
