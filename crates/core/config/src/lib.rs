@@ -388,7 +388,18 @@ pub async fn read() -> Config {
 
 #[cached(time = 30)]
 pub async fn config() -> Settings {
-    let mut config = read().await.try_deserialize::<Settings>().unwrap();
+    let raw = read().await;
+    
+    match raw.try_deserialize::<Settings>() {
+        Ok(config) => config,
+            Err(e) => {
+            eprintln!("Config load failed: {:?}", e);
+        for (key, val) in std::env::vars() {
+            eprintln!("[ENV] {key} = {val}");
+        }
+        panic!("Missing required config fields.");
+        }
+    }
 
     // inject REDIS_URI for redis-kiss library
     if std::env::var("REDIS_URL").is_err() {
