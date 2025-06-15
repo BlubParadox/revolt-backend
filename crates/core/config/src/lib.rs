@@ -387,47 +387,34 @@ pub async fn read() -> Config {
 }
 
 
-use figment::error::Error as FigmentError;
-
 #[cached(time = 30)]
 pub async fn config() -> Settings {
     let raw = read().await;
 
-    let mut config = match raw.try_deserialize::<Settings>() {
-        Ok(config) => config,
-        Err(FigmentError::MissingField(missing_field)) => {
-            eprintln!("Missing required config field: {}", missing_field);
-            panic!("Config missing a required field");
-        }
-        Err(FigmentError::InvalidType(_expected, value, path)) => {
-            eprintln!("Invalid type at {}: got {:?}", path, value);
-            panic!("Invalid config field type");
-        }
+    let mut config: Settings = match raw.try_deserialize() {
+        Ok(c) => c,
         Err(e) => {
-            eprintln!("Config load failed: {:?}", e);
-
-            if let FigmentError::Composite(errors) = e {
-                for error in errors {
-                    eprintln!(" - {}", error);
-                }
+            eprintln!("[ERROR] Failed to parse configuration:");
+            for line in format!("{e:?}").lines() {
+                eprintln!("  - {}", line);
             }
-
-            panic!("Config could not be deserialized");
+            panic!("Configuration error: see logs above.");
         }
     };
 
-    // inject REDIS_URI for redis-kiss library
+    // Inject REDIS_URI for redis-kiss
     if std::env::var("REDIS_URL").is_err() {
         std::env::set_var("REDIS_URI", config.database.redis.clone());
     }
 
-    // auto-detect production nodes
+    // Auto-detect production
     if config.hosts.api.contains("https") && config.hosts.api.contains("revolt.chat") {
         config.production = true;
     }
 
     config
 }
+
 
 /// Configure logging and common Rust variables
 pub async fn setup_logging(release: &'static str, dsn: String) -> Option<sentry::ClientInitGuard> {
