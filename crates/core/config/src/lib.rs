@@ -387,19 +387,37 @@ pub async fn read() -> Config {
 }
 
 #[cached(time = 30)]
+use figment::error::Error as FigmentError;
+
 pub async fn config() -> Settings {
     let raw = read().await;
 
-    let mut config = match raw.try_deserialize::<Settings>() {
+    let result = raw.try_deserialize::<Settings>();
+
+    match result {
         Ok(config) => config,
+        Err(FigmentError::MissingField(missing_field)) => {
+            eprintln!("Missing required config field: {}", missing_field);
+            panic!("Config missing a required field");
+        }
+        Err(FigmentError::InvalidType(_expected, value, path)) => {
+            eprintln!("Invalid type at {}: got {:?}", path, value);
+            panic!("Invalid config field type");
+        }
         Err(e) => {
             eprintln!("Config load failed: {:?}", e);
-            for (key, val) in std::env::vars() {
-                eprintln!("[ENV] {key} = {val}");
+
+            if let FigmentError::Composite(errors) = e {
+                for error in errors {
+                    eprintln!(" - {}", error);
+                }
             }
-            panic!("Missing required config fields.");
+
+            panic!("Config could not be deserialized");
         }
-    };
+    }
+}
+
 
     // inject REDIS_URI for redis-kiss library
     if std::env::var("REDIS_URL").is_err() {
