@@ -50,57 +50,21 @@ macro_rules! report_internal_error {
     };
 }
 
-/// Paths to search for configuration
-static CONFIG_SEARCH_PATHS: [&str; 3] = [
-    // current working directory
-    "Revolt.toml",
-    // current working directory - overrides file
-    "Revolt.overrides.toml",
-    // root directory, for Docker containers
-    "/Revolt.toml",
-];
+use config::{Config, Environment};
 
-/// Path to search for test overrides
-static TEST_OVERRIDE_PATH: &str = "Revolt.test-overrides.toml";
-
-/// Configuration builder
+/// Configuration builder using only environment variables
 static CONFIG_BUILDER: Lazy<RwLock<Config>> = Lazy::new(|| {
-    RwLock::new({
-        let mut builder = Config::builder().add_source(File::from_str(
-            include_str!("../Revolt.toml"),
-            FileFormat::Toml,
-        ));
-
-        if std::env::var("TEST_DB").is_ok() {
-            builder = builder.add_source(File::from_str(
-                include_str!("../Revolt.test.toml"),
-                FileFormat::Toml,
-            ));
-
-            // recursively search upwards for an overrides file (if there is one)
-            if let Ok(cwd) = std::env::current_dir() {
-                let mut path = Some(cwd.as_path());
-                while let Some(current_path) = path {
-                    let target_path = current_path.join(TEST_OVERRIDE_PATH);
-                    if target_path.exists() {
-                        builder = builder
-                            .add_source(File::new(target_path.to_str().unwrap(), FileFormat::Toml));
-                    }
-
-                    path = current_path.parent();
-                }
-            }
-        }
-
-        for path in CONFIG_SEARCH_PATHS {
-            if std::path::Path::new(path).exists() {
-                builder = builder.add_source(File::new(path, FileFormat::Toml));
-            }
-        }
-
-        builder.build().unwrap()
-    })
+    RwLock::new(
+        Config::builder()
+            // Load variables like DATABASE__MONGODB
+            .add_source(Environment::default().separator("__"))
+            // Support for Northflank: NF_FOXHAVEN_DATABASE__MONGODB, etc.
+            .add_source(Environment::with_prefix("NF_FOXHAVEN").separator("__"))
+            .build()
+            .expect("Failed to build configuration from environment variables"),
+    )
 });
+
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Database {

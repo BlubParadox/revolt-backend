@@ -72,11 +72,11 @@ async fn main() -> Result<(), std::io::Error> {
         .merge(Scalar::with_url("/scalar", ApiDoc::openapi()))
         .nest("/", api::router().await);
 
-    // Use PORT from env or default to 14705
+    // Use PORT from env or default to 14701
     let port = env::var("PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(14705);
+        .unwrap_or(14701);
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
 
     tracing::info!("Listening on 0.0.0.0:{port}");
